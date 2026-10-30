@@ -148,6 +148,7 @@ impl Studio {
                 self.proxied.clear();
                 self.echo = None;
                 self.dirty = false;
+                self.script_edits = 0;
                 self.project_name = info.name.clone();
                 self.export.name = projects::folder_name(&info.name);
                 self.selection.clear();
@@ -422,6 +423,7 @@ impl Studio {
         self.host.playback.set_muted(false);
         self.echo = None;
         self.dirty = false;
+        self.script_edits = 0;
         self.selection.clear();
         self.transition_selected = None;
         self.gesture = Gesture::None;

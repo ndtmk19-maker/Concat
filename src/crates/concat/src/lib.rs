@@ -44,6 +44,7 @@ mod i18n;
 #[cfg(target_os = "ios")]
 mod ios;
 mod keymap;
+mod live;
 mod meters;
 mod motion_tiles;
 mod platform;
@@ -2350,6 +2351,9 @@ fn start(project: Option<std::path::PathBuf>, smoke: Smoke) -> Result<(), slint:
     }));
     app.on_settings_server_token_generated(on_window!(|state| {
         state.handle(Msg::Settings(SettingsMsg::ServerTokenGenerated));
+    }));
+    app.on_settings_server_live_changed(on_window!(|state, on: bool| {
+        state.handle(Msg::Settings(SettingsMsg::ServerLiveChanged(on)));
     }));
     app.on_settings_check_updates(on_window!(|state| {
         state.handle(Msg::Settings(SettingsMsg::CheckUpdates));
