@@ -77,3 +77,25 @@ if [ "$got" != "$want" ]; then
   exit 1
 fi
 echo "fetch.sh: $name verified (sha256 $got)"
+
+if [ "$name" = "onnxruntime-win-x64" ] && [[ "$url" == *.nupkg ]]; then
+  py=$(command -v python || command -v python3)
+  "$py" - "$out" "${ORT_VERSION:-1.28.0}" <<'PY'
+import os, sys, zipfile
+src, ver = sys.argv[1], sys.argv[2]
+tmp = src + ".repack.zip"
+prefix = f"onnxruntime-win-x64-{ver}"
+with zipfile.ZipFile(src, "r") as zin, zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zout:
+    for info in zin.infolist():
+        if info.filename.startswith("runtimes/win-x64/native/"):
+            rel = info.filename[len("runtimes/win-x64/native/"):]
+            if rel:
+                zout.writestr(f"{prefix}/lib/{rel}", zin.read(info.filename))
+        elif info.filename.startswith("build/native/include/"):
+            rel = info.filename[len("build/native/include/"):]
+            if rel:
+                zout.writestr(f"{prefix}/include/{rel}", zin.read(info.filename))
+os.replace(tmp, src)
+PY
+  echo "fetch.sh: repacked $name nupkg into $out"
+fi
